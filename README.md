@@ -2,7 +2,7 @@
 
 This is a To Do List App in which, can add task, remove task, view task, Store task
 
-To run client (Frontend)
+--To run client (Frontend)
 cd client
 To install - npm install
 To run - npm run dev
