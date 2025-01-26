@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Home = () => {
   const [tasks, setTasks] = useState([]);
@@ -6,9 +6,7 @@ const Home = () => {
 
   const handleAddTask = async () => {
     if (newTask.trim()) {
-      // Add task to the database
-      await fetch("http://localhost:3000/api/tasks", {
-        // Update the URL to point to the server
+      const response = await fetch("http://localhost:3000/api/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -16,15 +14,32 @@ const Home = () => {
         body: JSON.stringify({ task: newTask }),
       });
 
-      setTasks([...tasks, newTask]);
+      const savedTask = await response.json();
+      setTasks([...tasks, savedTask]);
       setNewTask("");
     }
   };
 
-  const handleDeleteTask = (index) => {
+  const handleDeleteTask = async (index) => {
+    const taskToDelete = tasks[index];
+
+    await fetch(`http://localhost:3000/api/tasks/${taskToDelete._id}`, {
+      method: "DELETE",
+    });
+
     const updatedTasks = tasks.filter((task, i) => i !== index);
     setTasks(updatedTasks);
   };
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const response = await fetch("http://localhost:3000/todos");
+      const data = await response.json();
+      setTasks(data);
+    };
+
+    fetchTasks();
+  }, []);
 
   return (
     <div>
@@ -39,7 +54,7 @@ const Home = () => {
       <ul>
         {tasks.map((task, index) => (
           <li key={index}>
-            {task}
+            {task.title} {/* Display the task title */}
             <button onClick={() => handleDeleteTask(index)}>Delete</button>
           </li>
         ))}

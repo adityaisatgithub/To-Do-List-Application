@@ -35,7 +35,6 @@ app.get('/todos', async (req, res) => {
 // POST endpoint to add a new to-do item
 app.post('/api/tasks', async (req, res) => {
     const { task } = req.body;
-    console.log('Data received from client:', task); // Log the data received from client
     const newTask = new ToDo({
         title: task,
         completed: false
@@ -44,6 +43,19 @@ app.post('/api/tasks', async (req, res) => {
     try {
         const savedTask = await newTask.save();
         res.status(201).json(savedTask);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// DELETE endpoint to delete a to-do item
+app.delete('/api/tasks/:id', async (req, res) => {
+    try {
+        const deletedTask = await ToDo.findByIdAndDelete(req.params.id);
+        if (!deletedTask) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+        res.status(200).json({ message: 'Task deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
